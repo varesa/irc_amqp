@@ -19,7 +19,7 @@ var client = new irc.Client(irc_server, irc_user, {
 /* RabbitMQ */
 
 var rabbitmq_ch;
-var exchange = "amqp.irc." + channel;
+var exchange = "amqp.irc";
 
 var amqp = require("amqplib/callback_api");
 amqp.connect("amqp://" + rabbitmq_host, function (err, conn) {
@@ -41,6 +41,6 @@ client.addListener('message', function (from, to, message) {
         time: time
     };
     if(rabbitmq_ch) {
-        rabbitmq_ch.publish(exchange, "", new Buffer(JSON.stringify(object)));
+        rabbitmq_ch.publish(exchange, "messages.irc." + channel, new Buffer(JSON.stringify(object)));
     }
 });
