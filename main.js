@@ -12,7 +12,7 @@ var irc_user = process.env.irc_user;
 /* Twitch */
 
 var irc = require('irc');
-var client = new irc.Client('irc.yourserver.com', 'myNick', {
+var client = new irc.Client(irc_server, irc_user, {
     channels: ['#' + channel]
 });
 
@@ -30,7 +30,6 @@ amqp.connect("amqp://" + rabbitmq_host, function (err, conn) {
 });
 
 /* Connector */
-
 
 client.addListener('message', function (from, to, message) {
     var time = Date.now();
