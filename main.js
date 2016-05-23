@@ -2,35 +2,24 @@
  * Created by E on 23.5.2016.
  */
 
+
 var channel = process.env.channel;
 var rabbitmq_host = process.env.rabbitmq_host;
 
-var twitch_user = process.env.twitch_user;
-var twitch_auth = process.env.twitch_auth;
+var irc_server = process.env.irc_server;
+var irc_user = process.env.irc_user;
 
 /* Twitch */
 
-var irc = require("tmi.js");
-
-var options = {
-    connection: {
-        cluster: "aws",
-        reconnect: true
-    },
-    identity: {
-        username: twitch_user,
-        password: twitch_auth
-    },
-    channels: ["#" + channel]
-};
-
-var client = new irc.client(options);
-client.connect();
+var irc = require('irc');
+var client = new irc.Client('irc.yourserver.com', 'myNick', {
+    channels: ['#' + channel]
+});
 
 /* RabbitMQ */
 
 var rabbitmq_ch;
-var exchange = "amqp.irc.twitch-" + channel;
+var exchange = "amqp.irc." + channel;
 
 var amqp = require("amqplib/callback_api");
 amqp.connect("amqp://" + rabbitmq_host, function (err, conn) {
@@ -42,12 +31,13 @@ amqp.connect("amqp://" + rabbitmq_host, function (err, conn) {
 
 /* Connector */
 
-client.on("chat", function (channel, user, message, self) {
+
+client.addListener('message', function (from, to, message) {
     var time = Date.now();
     var object = {
         type: "messsage",
-        channel: channel,
-        user: user,
+        channel: to,
+        user: from,
         message: message,
         time: time
     };
